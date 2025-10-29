@@ -1,77 +1,60 @@
 package com.dragomir.internship_managment.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import java.util.ArrayList;
 import java.util.List;
 
+@Data
+@EqualsAndHashCode(callSuper = true, exclude = {"internships"})
+@ToString(callSuper = true, exclude = {"internships"})
 @Entity
-public class Company {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@Table(name = "companies")
+public class Company extends User {
 
-    private String name;
-    private String email;
-    private String password;
+    @Column(name = "company_name", nullable = false, length = 255)
+    private String companyName;
+
+    @Column(unique = true, nullable = false, length = 9)
+    private String pib;
+
+    @Column(nullable = false, length = 500)
     private String address;
-    private String phone;
 
-    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
-    private List<Internship> internships;
+    @Column(name = "contact_person", nullable = false, length = 200)
+    private String contactPerson;
 
-    public Long getId() {
-        return id;
+    @Column(name = "phone_number", nullable = false, length = 20)
+    private String phoneNumber;
+
+    @Column(length = 2000)
+    private String description;
+
+    @Column(length = 500)
+    private String website;
+
+    @Column(length = 500)
+    private String industry; // e.g., "IT", "Finance", "Healthcare"
+
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Internship> internships = new ArrayList<>();
+
+    public void addInternship(Internship internship) {
+        internships.add(internship);
+        internship.setCompany(this);
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void removeInternship(Internship internship) {
+        internships.remove(internship);
+        internship.setCompany(null);
     }
 
-    public String getName() {
-        return name;
-    }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public List<Internship> getInternships() {
-        return internships;
-    }
-
-    public void setInternships(List<Internship> internships) {
-        this.internships = internships;
-    }
 }
+

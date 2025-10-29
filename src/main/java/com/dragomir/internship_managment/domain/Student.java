@@ -1,87 +1,65 @@
 package com.dragomir.internship_managment.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import java.util.ArrayList;
 import java.util.List;
 
+@Data
+@EqualsAndHashCode(callSuper = true, exclude = {"applications"})
+@ToString(callSuper = true, exclude = {"applications"})
 @Entity
-public class Student {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@Table(name = "students")
+public class Student extends User {
 
+    @Column(name = "first_name", nullable = false, length = 100)
     private String firstName;
+
+    @Column(name = "last_name", nullable = false, length = 100)
     private String lastName;
-    private String email;
-    private String password;
-    private String faculty;
-    @Column(unique = true, nullable = false)
+
+    @Column(name = "index_number", unique = true, nullable = false, length = 50)
     private String indexNumber;
 
+    @Column(nullable = false, length = 255)
+    private String faculty;
 
-    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
-    private List<Application> applications;
+    @Column(name = "phone_number", length = 20)
+    private String phoneNumber;
 
-    public Long getId() {
-        return id;
+    @Column(name = "study_year", length = 50)
+    private String studyYear;
+
+    @Column(length = 500)
+    private String bio;
+
+    @Column(name = "gpa")
+    private Double gpa;
+
+    @Column(name = "skills", length = 1000)
+    private String skills; // Comma-separated or JSON
+
+
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Application> applications = new ArrayList<>();
+
+
+    public void addApplication(Application application) {
+        applications.add(application);
+        application.setStudent(this);
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void removeApplication(Application application) {
+        applications.remove(application);
+        application.setStudent(null);
     }
 
-    public List<Application> getApplications() {
-        return applications;
-    }
-
-    public void setApplications(List<Application> applications) {
-        this.applications = applications;
-    }
-
-    public String getIndexNumber() {
-        return indexNumber;
-    }
-
-    public void setIndexNumber(String indexNumber) {
-        this.indexNumber = indexNumber;
-    }
-
-    public String getFaculty() {
-        return faculty;
-    }
-
-    public void setFaculty(String faculty) {
-        this.faculty = faculty;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public String getFullName() {
+        return firstName + " " + lastName;
     }
 }
