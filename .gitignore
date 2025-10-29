@@ -1,4 +1,6 @@
-# Maven target
+# --------------------------
+# Maven build
+# --------------------------
 /target/
 !src/main/**/target/
 !src/test/**/target/
@@ -6,13 +8,17 @@
 # Maven wrapper
 .mvn/wrapper/maven-wrapper.jar
 
+# --------------------------
 # IntelliJ IDEA
+# --------------------------
 .idea/
 *.iml
 *.iws
 *.ipr
 
+# --------------------------
 # Eclipse / STS
+# --------------------------
 .project
 .classpath
 .settings/
@@ -20,7 +26,9 @@
 .springBeans/
 .sts4-cache/
 
+# --------------------------
 # NetBeans
+# --------------------------
 /nbproject/private/
 /nbbuild/
 /dist/
@@ -30,12 +38,24 @@ build/
 !src/main/**/build/
 !src/test/**/build/
 
+# --------------------------
 # VS Code
+# --------------------------
 .vscode/
 
+# --------------------------
 # Logs
+# --------------------------
 *.log
 
+# --------------------------
 # OS files
+# --------------------------
 .DS_Store
 Thumbs.db
+
+# --------------------------
+# Sensitive Spring files (ignore locally)
+# --------------------------
+/src/main/resources/application.properties
+/src/main/resources/application.yml
