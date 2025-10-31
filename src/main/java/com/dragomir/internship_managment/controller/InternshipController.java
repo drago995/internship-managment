@@ -1,7 +1,7 @@
 package com.dragomir.internship_managment.controller;
 
-import com.dragomir.internship_managment.domain.Company;
 import com.dragomir.internship_managment.domain.Internship;
+import com.dragomir.internship_managment.dto.ApiResponse;
 import com.dragomir.internship_managment.service.InternshipService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
-@RequestMapping("/company/internships")
-@PreAuthorize("hasRole('COMPANY')")
+@RequestMapping("/internships")
 public class InternshipController {
 
     private final InternshipService internshipService;
@@ -23,15 +23,24 @@ public class InternshipController {
         this.internshipService = internshipService;
     }
 
-    @PostMapping
-    @PreAuthorize("hasRole('COMPANY')")
-    public ResponseEntity<Internship> createOffer(@RequestBody Internship offer, Authentication auth) {
-        Internship saved = internshipService.createOfferByUser(offer, auth);
-        return ResponseEntity.ok(saved);
+    // Any authenticated user can view internships
+    @GetMapping
+    public ResponseEntity<ApiResponse> getAllInternships() {
+        List<Internship> internships = internshipService.getAllInternships();
+        return ResponseEntity.ok(
+                new ApiResponse(true, "Internships retrieved successfully", internships)
+        );
     }
 
-    @GetMapping
-    public List<Internship> getAll() {
-        return internshipService.getAllInternships();
+    // Only COMPANY can create
+    @PostMapping
+    @PreAuthorize("hasRole('COMPANY')")
+    public ResponseEntity<ApiResponse> createInternship(
+            @RequestBody Internship offer,
+            Authentication auth) {
+        Internship saved = internshipService.createOfferByUser(offer, auth);
+        return ResponseEntity.ok(
+                new ApiResponse(true, "Internship created successfully", saved)
+        );
     }
 }

@@ -11,7 +11,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -33,6 +32,15 @@ public class ApplicationService {
         Internship internship = internshipRepository.findById(internshipId)
                 .orElseThrow(() -> new RuntimeException("Internship not found"));
 
+        // Check if already applied - using existing method
+        List<Application> existingApplications = repo.findByStudent_Id(student.getId());
+        boolean alreadyApplied = existingApplications.stream()
+                .anyMatch(app -> app.getInternship().getId().equals(internshipId));
+
+        if (alreadyApplied) {
+            throw new RuntimeException("Already applied to this internship");
+        }
+
         Application application = new Application();
         application.setStudent(student);
         application.setInternship(internship);
@@ -53,9 +61,15 @@ public class ApplicationService {
         return savedApp;
     }
 
+    public List<Application> getApplicationsForStudent(Authentication auth) {
+        String email = auth.getName();
+        Student student = studentRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Student not found"));
+
+        return repo.findByStudent_Id(student.getId());
+    }
 
     public List<Application> getAllApplications() {
         return repo.findAll();
     }
-
 }

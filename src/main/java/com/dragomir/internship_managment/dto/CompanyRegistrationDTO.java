@@ -31,8 +31,7 @@ public class CompanyRegistrationDTO {
 
     @NotBlank(message = "Telefon je obavezan")
     private String phoneNumber;
-
-    private String description;
     private String website;
+    private String description;
     private String companySize;
 }
