@@ -12,10 +12,9 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    // 🔐 Securely generated key for HS512 (minimum 512 bits)
+
     private final Key signingKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 
-    // ⏱ Token expiration time (e.g., 1 hour)
     private final long jwtExpirationMs = 3600000; // 1 hour
 
     public String generateToken(Authentication authentication) {

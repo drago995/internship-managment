@@ -32,7 +32,7 @@ public class ApplicationService {
         Internship internship = internshipRepository.findById(internshipId)
                 .orElseThrow(() -> new RuntimeException("Internship not found"));
 
-        // Check if already applied - using existing method
+        // Check if already applied
         List<Application> existingApplications = repo.findByStudent_Id(student.getId());
         boolean alreadyApplied = existingApplications.stream()
                 .anyMatch(app -> app.getInternship().getId().equals(internshipId));
@@ -48,7 +48,7 @@ public class ApplicationService {
 
         Application savedApp = repo.save(application);
 
-        // ✉️ Pošalji mejl studentu
+        //  Pošalji mejl studentu
         emailService.sendEmail(
                 student.getEmail(),
                 "Uspešna prijava na praksu",
