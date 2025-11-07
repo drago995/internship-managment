@@ -5,8 +5,11 @@ import com.dragomir.internship_managment.domain.Internship;
 import com.dragomir.internship_managment.repository.CompanyRepository;
 import com.dragomir.internship_managment.repository.InternshipRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -34,6 +37,13 @@ public class InternshipService {
 
     public List<Internship> getAllInternships() {
         return internshipRepository.findAll();
+    }
+
+    public Page<Internship> getFilteredInternships(int page, int limit, String search, String location, String company, Integer weeksDuration, Boolean isPaid){
+        System.out.println("3AAAAAAAAAAAAAAAAAAAAAAAA");
+        Pageable p = PageRequest.of(page -1, limit);
+        return internshipRepository.findFilteredInternships(search, location, company, weeksDuration, isPaid, p);
+
     }
 
 

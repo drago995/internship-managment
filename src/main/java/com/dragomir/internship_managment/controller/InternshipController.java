@@ -23,12 +23,28 @@ public class InternshipController {
         this.internshipService = internshipService;
     }
 
-    // Any authenticated user can view internships
+
     @GetMapping
-    public ResponseEntity<ApiResponse> getAllInternships() {
-        List<Internship> internships = internshipService.getAllInternships();
+    public ResponseEntity<ApiResponse> getFilteredInternships(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "limit", defaultValue = "5") int limit,
+            @RequestParam(value = "search", required = false) String search,
+            @RequestParam(value = "location", required = false) String location,
+            @RequestParam(value = "company", required = false) String company,
+            @RequestParam(value = "weeksDuration", required = false) Integer weeksDuration,
+            @RequestParam(value = "isPaid", required = false) Boolean isPaid
+    )
+
+
+    {
+        System.out.println("1");
+        // Poziv servisa koji vraća filtrirane i paginirane podatke
+                var result = internshipService.getFilteredInternships(
+                page, limit, search, location, company, weeksDuration, isPaid
+        );
+        System.out.println("2");
         return ResponseEntity.ok(
-                new ApiResponse(true, "Internships retrieved successfully", internships)
+                new ApiResponse(true, "Internships retrieved successfully", result)
         );
     }
 

@@ -1,10 +1,28 @@
 package com.dragomir.internship_managment.repository;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import com.dragomir.internship_managment.domain.Internship;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface InternshipRepository extends JpaRepository<Internship, Long> {
-
-
+// custom jpql query
+@Query("SELECT i FROM Internship i " +
+        "WHERE (:search IS NULL OR :search = '' OR LOWER(i.title) LIKE LOWER(CONCAT('%', :search, '%')) " +
+        "OR LOWER(i.description) LIKE LOWER(CONCAT('%', :search, '%'))) " +
+        "AND (:location IS NULL OR :location = '' OR LOWER(i.location) LIKE LOWER(CONCAT('%', :location, '%'))) " +
+        "AND (:company IS NULL OR :company = '' OR LOWER(i.company.companyName) LIKE LOWER(CONCAT('%', :company, '%'))) " +  // ✅ companyName
+        "AND (:weeksDuration IS NULL OR i.durationWeeks >= :weeksDuration) " +
+        "AND (:isPaid IS NULL OR i.isPaid = :isPaid)")
+Page<Internship> findFilteredInternships(
+        @Param("search") String search,
+        @Param("location") String location,
+        @Param("company") String company,
+        @Param("weeksDuration") Integer weeksDuration,
+        @Param("isPaid") Boolean isPaid,
+        Pageable pageable
+);
 
 }

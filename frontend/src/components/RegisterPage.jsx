@@ -85,7 +85,7 @@ export default function RegisterPage() {
       };
     }
 
-    const result = await register(registerData, formData.role); // <- pass role to API call
+    const result = await register(registerData, formData.role); // <- prosledi ROLE bekendu
     if (result.success) {
       setSuccess(true);
       setTimeout(() => navigate('/login'), 2000);
@@ -191,7 +191,7 @@ export default function RegisterPage() {
   );
 }
 
-/* Small helper input component */
+// reusable input komponenta
 function Input({ name, label, value, onChange, type = 'text' }) {
   return (
     <div>
