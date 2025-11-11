@@ -78,7 +78,6 @@ public class InternshipManagmentApplication {
 			student1.setFirstName("Petar");
 			student1.setLastName("Petrović");
 			student1.setIndexNumber("2020/0001");
-			student1.setFaculty("Elektrotehnički fakultet, Beograd");
 			student1.setPhoneNumber("+381641111111");
 			student1.setStudyYear("3");
 			student1.setBio("Student softverskog inzenjerstva sa strašću za web development.");
@@ -93,7 +92,6 @@ public class InternshipManagmentApplication {
 			student2.setFirstName("Marija");
 			student2.setLastName("Jovanović");
 			student2.setIndexNumber("2021/0042");
-			student2.setFaculty("Fakultet tehničkih nauka, Novi Sad");
 			student2.setPhoneNumber("+381652222222");
 			student2.setStudyYear("2");
 			student2.setBio("Zainteresovana za frontend development i UI/UX dizajn.");

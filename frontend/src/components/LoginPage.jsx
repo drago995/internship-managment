@@ -11,7 +11,7 @@ export default function LoginPage() {
   const { login, user } = useAuth();
   const navigate = useNavigate();
 
-  // ✅ Redirect ako je vec ulogovan
+
   useEffect(() => {
     if (user) {
       if (user.role === 'STUDENT') {
@@ -27,7 +27,7 @@ export default function LoginPage() {
   const handleSubmit = async () => {
     setError('');
 
-    // ✅ Validacija
+
     if (!email || !password) {
       setError('Email i lozinka su obavezni');
       return;
@@ -38,7 +38,7 @@ export default function LoginPage() {
     const result = await login({ email, password });
 
     if (result.success) {
-      // ✅ Koristi userData iz rezultata
+
       const loggedUser = result.user;
       
       if (loggedUser.role === 'STUDENT') {

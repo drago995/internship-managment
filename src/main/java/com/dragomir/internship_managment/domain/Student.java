@@ -24,8 +24,6 @@ public class Student extends User {
     @Column(name = "index_number", unique = true, nullable = false, length = 50)
     private String indexNumber;
 
-    @Column(nullable = false, length = 255)
-    private String faculty;
 
     @Column(name = "phone_number", length = 20)
     private String phoneNumber;
@@ -37,12 +35,14 @@ public class Student extends User {
     private String bio;
 
     @Column(name = "gpa")
+
     private Double gpa;
 
     @Column(name = "skills", length = 1000)
-    private String skills; // Comma-separated or JSON
+    private String skills; //
 
-
+    @Column(name ="cv_file_path", length = 500)
+    private String cvFilePath;
 
     @JsonIgnore
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)

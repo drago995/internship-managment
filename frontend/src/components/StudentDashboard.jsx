@@ -1,12 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState} from "react";
 import { Users, LogOut, Home, Briefcase, Mail } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import BrowseInternships from "./BrowseInternships";
+import StudentProfile from "./StudentProfile"; 
+
 
 export default function StudentDashboard() {
   const [activeTab, setActiveTab] = useState("home");
   const { logout } = useAuth();
-
+  // renderuj sadrza u zavisnosti od aktivnog taba
   const renderContent = () => {
     switch (activeTab) {
       case "home":
@@ -28,6 +30,8 @@ export default function StudentDashboard() {
             <p>Ova sekcija će prikazivati vaše prijave.</p>
           </div>
         );
+      case "profile":
+        return <StudentProfile />;
       default:
         return null;
     }
@@ -73,6 +77,12 @@ export default function StudentDashboard() {
             active={activeTab === "applications"}
             onClick={() => setActiveTab("applications")}
           />
+          <TabButton
+            label="Profil"
+            icon={Users}
+            active={activeTab === "Profil"}
+            onClick={() => setActiveTab("profile")}
+            />
         </div>
       </div>
 
