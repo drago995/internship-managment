@@ -24,7 +24,7 @@ public class StudentController {
         this.studentService = userService;
     }
 
-    @GetMapping
+    @GetMapping("/profile")
     public ResponseEntity<ApiResponse> getStudentProfile(Authentication authentication){
         String email = authentication.getName();
         Student student = studentService.getStudentByEmail(email);

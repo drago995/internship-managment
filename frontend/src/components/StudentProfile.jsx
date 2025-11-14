@@ -210,18 +210,7 @@ export default function StudentProfile() {
               </select>
             </div>
 
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Fakultet
-              </label>
-              <input
-                type="text"
-                name="faculty"
-                value={student.faculty}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
+          
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
