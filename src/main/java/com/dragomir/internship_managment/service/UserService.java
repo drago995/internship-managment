@@ -42,7 +42,6 @@ public class UserService implements UserDetailsService {
         student.setFirstName(dto.getFirstName());
         student.setLastName(dto.getLastName());
         student.setIndexNumber(dto.getIndexNumber());
-        student.setFaculty(dto.getFaculty());
         student.setPhoneNumber(dto.getPhoneNumber());
         student.setStudyYear(dto.getStudyYear());
         student.setBio(dto.getBio());
