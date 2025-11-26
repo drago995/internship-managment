@@ -24,8 +24,8 @@ public class InternshipController {
         this.internshipService = internshipService;
     }
 
-    // GET internships (with optional query parameters for filtering)
-    @GetMapping({"", "/all"})
+    // 1️⃣ Vrati filtrirane prakse (sa paginacijom i filterima)
+    @GetMapping
     public ResponseEntity<ApiResponse> getFilteredInternships(
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "limit", defaultValue = "5") int limit,
@@ -35,21 +35,22 @@ public class InternshipController {
             @RequestParam(value = "weeksDuration", required = false) Integer weeksDuration,
             @RequestParam(value = "isPaid", required = false) Boolean isPaid
     ) {
-
-
         var result = internshipService.getFilteredInternships(page, limit, search, location, company, weeksDuration, isPaid);
-
         return ResponseEntity.ok(new ApiResponse(true, "Internships retrieved successfully", result));
     }
 
-    // POST internship (COMPANY only)
-    @PostMapping({"", "/create"})
+    // 2️⃣ Vrati jednu praksu po ID-u
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse> getInternshipById(@PathVariable Long id) {
+        var internship = internshipService.getInternshipById(id);
+        return ResponseEntity.ok(new ApiResponse(true, "Internship retrieved successfully", internship));
+    }
+
+    // 3️⃣ Kreiraj novu praksu (COMPANY only)
+    @PostMapping
     @PreAuthorize("hasRole('COMPANY')")
-    // napravi DTO da ne bi otkrivao unutrasnju strukturu domena
     public ResponseEntity<ApiResponse> createInternship(@RequestBody Internship offer, Authentication auth) {
-
         Internship saved = internshipService.createOfferByUser(offer, auth);
-
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponse(true, "Internship created successfully", saved));
     }

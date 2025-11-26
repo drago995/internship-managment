@@ -35,7 +35,7 @@ export default function FacultyDashboard() {
       const internshipsData = await internshipsRes.json();
       const applicationsData = await applicationsRes.json();
 
-      // ✅ Handle responses that might be wrapped in { success, data }
+      
       setInternships(Array.isArray(internshipsData) ? internshipsData : internshipsData.data || []);
       setApplications(Array.isArray(applicationsData) ? applicationsData : applicationsData.data || []);
     } catch (error) {

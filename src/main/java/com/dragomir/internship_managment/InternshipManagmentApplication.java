@@ -202,7 +202,6 @@ public class InternshipManagmentApplication {
 			application2.setStatus(ApplicationStatus.PENDING);
 			application2.setAppliedAt(LocalDateTime.now().minusDays(1));
 			application2.setCoverLetter("Veoma sam motivisana da radim na React projektima i učim od iskusnih mentora.");
-			application2.setCvUrl("https://example.com/cv/marija-jovanovic.pdf");
 			applicationRepository.save(application2);
 
 			System.out.println(" Test data initialized successfully!");

@@ -37,3 +37,4 @@ export default function ProtectedRoute({ children, allowedRoles }) {
   // User is authenticated and has the right role
   return children;
 }
+

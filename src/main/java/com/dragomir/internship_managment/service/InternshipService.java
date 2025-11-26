@@ -46,5 +46,11 @@ public class InternshipService {
 
     }
 
+    public Internship getInternshipById(Long id) {
+        return internshipRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Internship with id " + id + " not found"));
+    }
+
+
 
 }

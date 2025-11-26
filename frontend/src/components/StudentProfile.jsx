@@ -8,6 +8,8 @@ import {
   FileText,
   Save,
   Upload,
+  Download,
+  Trash2,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
@@ -17,6 +19,9 @@ export default function StudentProfile() {
   const { token } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingCV, setUploadingCV] = useState(false);
+  // for keeping the url of the CV once it was uploaded
+  const [cvInfo, setCvInfo] = useState(null); 
   const [student, setStudent] = useState({
     firstName: "",
     lastName: "",
@@ -32,7 +37,8 @@ export default function StudentProfile() {
   useEffect(() => {
     fetchStudentProfile();
   }, []);
-  // na ucitavanje ucitaj podatke o studentu
+
+  // fetching student profile info and CV together and extracting CV
   const fetchStudentProfile = async () => {
     setLoading(true);
     try {
@@ -42,7 +48,9 @@ export default function StudentProfile() {
       const result = await response.json();
 
       if (result.success) {
-        setStudent(result.data);
+        const { cv, ...studentData } = result.data; 
+        setStudent(studentData);
+        setCvInfo(cv); // Store CV infos
       }
     } catch (error) {
       console.error("Error fetching profile:", error);
@@ -86,13 +94,73 @@ export default function StudentProfile() {
     }
   };
 
-  const handleCVUpload = (e) => {
+  
+  const handleCVUpload = async (e) => {
     const file = e.target.files[0];
-    if (file && file.type === "application/pdf") {
-      // upload CV a na bekend
-      alert(`CV uploaded: ${file.name}`);
-    } else {
+    if (!file) return;
+
+    if (file.type !== "application/pdf") {
       alert("Molimo učitajte PDF fajl");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Fajl je prevelik. Maksimalna veličina je 5MB");
+      return;
+    }
+
+    setUploadingCV(true);
+    try {
+      const formData = new FormData();
+      formData.append("cv", file);
+
+      const response = await fetch(`${API_URL}/students/profile/cv`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setCvInfo(result.data); //  url 
+        alert("CV uspešno učitan!");
+      } else {
+        alert("Greška pri učitavanju CV-a");
+      }
+    } catch (error) {
+      console.error("Error uploading CV:", error);
+      alert("Greška pri učitavanju CV-a");
+    } finally {
+      setUploadingCV(false);
+    }
+  };
+
+
+  const handleCVDelete = async () => {
+   // if (!confirm("Da li ste sigurni da želite da obrišete CV?")) return;
+
+    try {
+      const response = await fetch(`${API_URL}/students/profile/cv`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setCvInfo(null);
+        alert("CV uspešno obrisan!");
+      } else {
+        alert("Greška pri brisanju CV-a");
+      }
+    } catch (error) {
+      console.error("Error deleting CV:", error);
+      alert("Greška pri brisanju CV-a");
     }
   };
 
@@ -210,8 +278,6 @@ export default function StudentProfile() {
               </select>
             </div>
 
-          
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                 <Award className="w-4 h-4" />
@@ -259,27 +325,82 @@ export default function StudentProfile() {
           </p>
         </div>
 
-        {/* CV Upload Section */}
+        {/* CV SECTION */}
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <FileText className="w-5 h-5" />
             CV (Curriculum Vitae)
           </h2>
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-            <Upload className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-            <label className="cursor-pointer">
-              <span className="text-blue-600 hover:text-blue-700 font-medium">
-                Učitaj CV
-              </span>
-              <input
-                type="file"
-                accept=".pdf"
-                onChange={handleCVUpload}
-                className="hidden"
-              />
-            </label>
-            <p className="text-sm text-gray-500 mt-2">PDF format, maks 5MB</p>
-          </div>
+
+          {cvInfo ? (
+            // Show existing CV with download and delete
+            <div className="border border-gray-300 rounded-lg p-4 bg-gray-50">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <p className="font-medium text-gray-900">{cvInfo.filename}</p>
+                  <p className="text-sm text-gray-500">
+                    Učitano: {new Date(cvInfo.uploadDate).toLocaleDateString('sr-RS')}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <a
+                    href={cvInfo.url}
+                    download
+                    className="flex items-center gap-2 px-3 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors text-sm"
+                  >
+                    <Download className="w-4 h-4" />
+                    Preuzmi
+                  </a>
+                  <button
+                    onClick={handleCVDelete}
+                    className="flex items-center gap-2 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-sm"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Obriši
+                  </button>
+                </div>
+              </div>
+              
+              <div className="pt-3 border-t border-gray-200">
+                <label className="cursor-pointer text-blue-600 hover:text-blue-700 text-sm font-medium">
+                  Zameni novi CV
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    onChange={handleCVUpload}
+                    disabled={uploadingCV}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+            </div>
+          ) : (
+            // Upload new CV
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+              {uploadingCV ? (
+                <div className="flex flex-col items-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-3"></div>
+                  <p className="text-gray-600">Učitavanje CV-a...</p>
+                </div>
+              ) : (
+                <>
+                  <Upload className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                  <label className="cursor-pointer">
+                    <span className="text-blue-600 hover:text-blue-700 font-medium">
+                      Učitaj CV
+                    </span>
+                    <input
+                      type="file"
+                      accept=".pdf"
+                      onChange={handleCVUpload}
+                      className="hidden"
+                    />
+                  </label>
+                  <p className="text-sm text-gray-500 mt-2">PDF format, maks 5MB</p>
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Save Button */}
