@@ -4,6 +4,7 @@ import {
   Mail,
   Phone,
   BookOpen,
+
   Award,
   FileText,
   Save,
@@ -20,8 +21,8 @@ export default function StudentProfile() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingCV, setUploadingCV] = useState(false);
-  // for keeping the url of the CV once it was uploaded
-  const [cvInfo, setCvInfo] = useState(null); 
+  // for keeping the url of the CV once it was uploaded for deletion/download etc
+  const [cvInfo, setCvInfo] = useState(null);
   const [student, setStudent] = useState({
     firstName: "",
     lastName: "",
@@ -46,11 +47,21 @@ export default function StudentProfile() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const result = await response.json();
-
+      console.log("API response:", result);
       if (result.success) {
-        const { cv, ...studentData } = result.data; 
-        setStudent(studentData);
-        setCvInfo(cv); // Store CV infos
+        setStudent(result.data); //  set the whole student object
+
+        // Extract CV info if it exists
+        if (result.data.cvFilePath) {
+          console.log("Ucitan je CV")
+          setCvInfo({
+            filename: result.data.cvFileName,
+            url: result.data.cvFilePath,
+            uploadDate: result.data.cvUploadDate
+          });
+        } else {
+          setCvInfo(null);
+        }
       }
     } catch (error) {
       console.error("Error fetching profile:", error);
@@ -58,7 +69,7 @@ export default function StudentProfile() {
       setLoading(false);
     }
   };
-
+  // copies previous state apart from specific field
   const handleChange = (e) => {
     const { name, value } = e.target;
     setStudent((prev) => ({
@@ -94,7 +105,7 @@ export default function StudentProfile() {
     }
   };
 
-  
+
   const handleCVUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -125,7 +136,14 @@ export default function StudentProfile() {
       const result = await response.json();
 
       if (result.success) {
-        setCvInfo(result.data); //  url 
+        setCvInfo(result.data);
+        // Also update student state with new CV fields
+        setStudent(prev => ({
+          ...prev,
+          cvFilename: result.data.filename,
+          cvUrl: result.data.url,
+          cvUploadDate: result.data.uploadDate
+        }));
         alert("CV uspešno učitan!");
       } else {
         alert("Greška pri učitavanju CV-a");
@@ -136,11 +154,12 @@ export default function StudentProfile() {
     } finally {
       setUploadingCV(false);
     }
+    e.target.value = null;
   };
 
 
   const handleCVDelete = async () => {
-   // if (!confirm("Da li ste sigurni da želite da obrišete CV?")) return;
+    // if (!confirm("Da li ste sigurni da želite da obrišete CV?")) return; 
 
     try {
       const response = await fetch(`${API_URL}/students/profile/cv`, {
@@ -154,6 +173,13 @@ export default function StudentProfile() {
 
       if (result.success) {
         setCvInfo(null);
+        // update student state to clear CV fields
+        setStudent(prev => ({
+          ...prev,
+          cvFilename: null,
+          cvUrl: null,
+          cvUploadDate: null
+        }));
         alert("CV uspešno obrisan!");
       } else {
         alert("Greška pri brisanju CV-a");
@@ -161,6 +187,26 @@ export default function StudentProfile() {
     } catch (error) {
       console.error("Error deleting CV:", error);
       alert("Greška pri brisanju CV-a");
+    }
+  };
+  const handleDownloadCV = async () => {
+    try {
+      const response = await fetch(`${API_URL}/students/profile/cv/download`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = cvInfo.filename; 
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error downloading CV:", error);
     }
   };
 
@@ -173,6 +219,8 @@ export default function StudentProfile() {
       </div>
     );
   }
+
+
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -343,14 +391,13 @@ export default function StudentProfile() {
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  <a
-                    href={cvInfo.url}
-                    download
+                  <button
+                    onClick={handleDownloadCV} // Option 3 function
                     className="flex items-center gap-2 px-3 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors text-sm"
                   >
                     <Download className="w-4 h-4" />
                     Preuzmi
-                  </a>
+                  </button>
                   <button
                     onClick={handleCVDelete}
                     className="flex items-center gap-2 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-sm"
@@ -360,7 +407,7 @@ export default function StudentProfile() {
                   </button>
                 </div>
               </div>
-              
+
               <div className="pt-3 border-t border-gray-200">
                 <label className="cursor-pointer text-blue-600 hover:text-blue-700 text-sm font-medium">
                   Zameni novi CV

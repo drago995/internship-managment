@@ -61,4 +61,4 @@ Thumbs.db
 /src/main/resources/application.yml
 
 # ignore uploaded CVs
-uploads/
+/uploads/

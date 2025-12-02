@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +45,16 @@ public class Student extends User {
 
     @Column(name ="cv_file_path", length = 500)
     private String cvFilePath;
+
+    @Column(name = "cv_file_name", length = 500)
+    private String cvFileName;
+
+    @Column(name = "cv_upload_date")
+    private LocalDateTime cvUploadDate;
+
+
+
+
 
     @JsonIgnore
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
