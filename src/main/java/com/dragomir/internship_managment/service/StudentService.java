@@ -44,6 +44,11 @@ public class StudentService {
         Student student = studentRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Student not found"));
 
+        // for reupload, delete the already existing pdf
+        if(student.getCvFilePath() != null){
+            deleteStudentCV(email);
+        }
+
         // generate unique filename
         String filename = file.getOriginalFilename();
         String cvPath = "/cv/" + filename;

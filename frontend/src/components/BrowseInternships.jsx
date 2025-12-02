@@ -26,7 +26,7 @@ export default function BrowseInternships() {
   const [isPaid, setIsPaid] = useState(searchParams.get("isPaid") || "");
   const [currentPage, setCurrentPage] = useState(Number(searchParams.get("page")) || 1);
 
-  // Active filters for actual fetch
+  // active filters for actual fetch
   const [activeFilters, setActiveFilters] = useState({
     search: searchTerm,
     location: selectedLocation,
@@ -45,7 +45,7 @@ export default function BrowseInternships() {
   // fetch only when active filters change / or on page change (so i can remember where user left of in search)
   useEffect(() => {
     fetchInternships(activeFilters);
-    // Update URL whenever activeFilters change
+    // update URL whenever activeFilters change
     const params = new URLSearchParams({
       search: activeFilters.search,
       location: activeFilters.location,
