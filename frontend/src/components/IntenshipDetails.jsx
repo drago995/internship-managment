@@ -19,7 +19,7 @@ export default function InternshipDetails() {
           headers: { Authorization: `Bearer ${token}` },
         });
         const result = await response.json();
-        // Your backend returns the internship directly in data
+
         setInternship(result.data);
       } catch (err) {
         console.error(err);
@@ -29,6 +29,30 @@ export default function InternshipDetails() {
     };
     fetchInternship();
   }, [id, token]);
+
+  const handleApply = async () => {
+    try {
+      const response = await fetch(`${API_URL}/applications`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          internshipId: id,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to apply");
+      }
+
+      const data = await response.json();
+      console.log("Applicet successfully:", data);
+
+    } catch (err) {
+      console.error(err)
+    }
+
+  }
 
   if (loading) return <div className="text-center py-12">Loading...</div>;
   if (!internship) return <div className="text-center py-12">Internship not found</div>;
@@ -106,7 +130,10 @@ export default function InternshipDetails() {
         {/* Deadline + Apply Button */}
         <div className="flex justify-between items-center pt-6 border-t border-gray-200">
           <span className="text-gray-500 text-sm">Deadline: {internship.deadline || "N/A"}</span>
-          <button className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+          <button
+            className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            onClick={handleApply}
+          >
             Apply
           </button>
         </div>

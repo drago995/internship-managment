@@ -48,7 +48,7 @@ public class ApplicationService {
 
         Application savedApp = repo.save(application);
 
-        //  Pošalji mejl studentu
+        //  send successfull applicaiton email
         emailService.sendEmail(
                 student.getEmail(),
                 "Uspešna prijava na praksu",

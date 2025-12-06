@@ -1,4 +1,4 @@
-package com.dragomir.internship_managment.exception;
+package com.dragomir.internship_managment.exceptions;
 
 
 

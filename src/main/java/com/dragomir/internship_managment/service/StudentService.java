@@ -51,7 +51,7 @@ public class StudentService {
 
         // generate unique filename
         String filename = file.getOriginalFilename();
-        String cvPath = "/cv/" + filename;
+        String cvPath = "/" + filename;
 
 
         student.setCvFilePath(cvPath);

@@ -1,7 +1,7 @@
 package com.dragomir.internship_managment.domain;
 
 import com.dragomir.internship_managment.dto.StudentRegistrationDTO;
-import com.dragomir.internship_managment.exception.UserAlreadyExistsException;
+import com.dragomir.internship_managment.exceptions.UserAlreadyExistsException;
 import com.dragomir.internship_managment.repository.StudentRepository;
 import com.dragomir.internship_managment.repository.UserRepository;
 import com.dragomir.internship_managment.service.UserService;
