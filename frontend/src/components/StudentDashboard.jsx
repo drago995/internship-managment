@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import BrowseInternships from "./BrowseInternships";
 import StudentProfile from "./StudentProfile";
 import InternshipDetails from "./IntenshipDetails";
+import StudentApplications from "./StudentApplications";
 
 export default function StudentDashboard() {
   const { logout } = useAuth(null);
@@ -15,7 +16,7 @@ export default function StudentDashboard() {
         <div className="max-w-7xl mx-auto flex justify-between items-center h-16 px-6">
           <div className="flex items-center gap-3">
             <Users className="h-7 w-7 text-indigo-600" />
-            <span className="text-xl font-bold text-gray-900">Student Portal</span>
+            <span className="text-xl font-bold text-gray-900">Student</span>
           </div>
           <button
             onClick={logout}
@@ -43,7 +44,7 @@ export default function StudentDashboard() {
           <Route path="/" element={<HomePage />} />
           <Route path="browse" element={<BrowseInternships />} />
           <Route path="browse/:id" element={<InternshipDetails />} />
-          <Route path="applications" element={<ApplicationsPage />} />
+          <Route path="applications" element={<StudentApplications />} />
           <Route path="profile" element={<StudentProfile />} />
           <Route path="*" element={<Navigate to="/student/dashboard" replace />} />
         </Routes>
@@ -68,7 +69,7 @@ function HomePage() {
   return (
     <div className="text-center py-16">
       <h2 className="text-3xl font-bold text-gray-900 mb-4">
-        Dobrodošli na Student Portal
+        Dobrodošli
       </h2>
       <p className="text-gray-600">
         Ovde možete pregledati dostupne prakse i pratiti svoje prijave.
@@ -77,10 +78,4 @@ function HomePage() {
   );
 }
 
-function ApplicationsPage() {
-  return (
-    <div className="text-center py-16 text-gray-600">
-      <p>Ova sekcija će prikazivati vaše prijave.</p>
-    </div>
-  );
-}
+

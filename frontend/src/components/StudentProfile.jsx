@@ -191,7 +191,7 @@ export default function StudentProfile() {
   };
   const handleDownloadCV = async () => {
     try {
-      const response = await fetch(`${API_URL}/students/profile/cv/download`, {
+      const response = await fetch(`${API_URL}/students/profile/cv`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

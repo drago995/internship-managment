@@ -6,6 +6,7 @@ import { MapPin, Calendar, DollarSign } from "lucide-react";
 const API_URL = "http://localhost:8080";
 
 export default function InternshipDetails() {
+  //  changes value automaticaly when url changes, triggering useEffect
   const { id } = useParams();
   const { token } = useAuth();
   const navigate = useNavigate();
@@ -31,28 +32,27 @@ export default function InternshipDetails() {
   }, [id, token]);
 
   const handleApply = async () => {
-    try {
-      const response = await fetch(`${API_URL}/applications`, {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}` },
-        body: JSON.stringify({
-          internshipId: id,
-        }),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to apply");
+  try {
+    const response = await fetch(`${API_URL}/internships/${id}/applications`, {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
       }
+    });
 
-      const data = await response.json();
-      console.log("Applicet successfully:", data);
-
-    } catch (err) {
-      console.error(err)
+    if (!response.ok) {
+      throw new Error("Failed to apply");
     }
 
+    const data = await response.json();
+    console.log("Applied successfully:", data);
+
+  } catch (err) {
+    console.error(err);
   }
+};
+
 
   if (loading) return <div className="text-center py-12">Loading...</div>;
   if (!internship) return <div className="text-center py-12">Internship not found</div>;
@@ -127,7 +127,7 @@ export default function InternshipDetails() {
           </ul>
         </div>
 
-        {/* Deadline + Apply Button */}
+        {/* Apply Button */}
         <div className="flex justify-between items-center pt-6 border-t border-gray-200">
           <span className="text-gray-500 text-sm">Deadline: {internship.deadline || "N/A"}</span>
           <button

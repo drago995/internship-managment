@@ -28,14 +28,7 @@ public class JwtUtil {
                 .compact();
     }
 
-    public String generateTokenFromUsername(String username) {
-        return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
-                .signWith(signingKey, SignatureAlgorithm.HS512)
-                .compact();
-    }
+
 
     public String getUsernameFromToken(String token) {
         return Jwts.parserBuilder()

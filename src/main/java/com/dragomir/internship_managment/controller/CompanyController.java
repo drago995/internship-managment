@@ -1,0 +1,36 @@
+package com.dragomir.internship_managment.controller;
+
+import com.dragomir.internship_managment.service.StudentService;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+
+@RestController
+@RequestMapping("/company")
+@CrossOrigin(origins = "http://localhost:3000")
+public class CompanyController {
+    // NAPRAVCEMO FILE CONTROLLER
+    private final StudentService studentService;
+
+    public CompanyController(StudentService studentService) {
+        this.studentService = studentService;
+    }
+
+
+    @GetMapping("/applications/{studentId}/cv/download")
+    @PreAuthorize("hasRole('COMPANY')") // make sure only company users can access
+    public ResponseEntity<Resource> downloadCV(@PathVariable Long studentId) throws IOException {
+        Resource resource = studentService.getStudentCVByStudentId(studentId);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + resource.getFilename() + "\"")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(resource);
+    }
+}

@@ -59,7 +59,7 @@ public class StudentController {
 
     }
 
-    @GetMapping("/profile/cv/download")
+    @GetMapping("/profile/cv")
     public ResponseEntity<Resource> downloadCV(Authentication authentication) throws IOException {
         Resource resource = studentService.getStudentCV(authentication.getName());
 

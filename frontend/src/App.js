@@ -18,7 +18,7 @@ function App() {
 
           {/* Protected routes - Company */}
           <Route
-            path="/company/dashboard"
+            path="/company/dashboard/*"
             element={
               <ProtectedRoute allowedRoles={['COMPANY']}>
                 <CompanyDashboard />
@@ -38,7 +38,7 @@ function App() {
 
           {/* Protected routes - Faculty */}
           <Route
-            path="/faculty/dashboard"
+            path="/faculty/dashboard/*"
             element={
               <ProtectedRoute allowedRoles={['FACULTY']}>
                 <FacultyDashboard />

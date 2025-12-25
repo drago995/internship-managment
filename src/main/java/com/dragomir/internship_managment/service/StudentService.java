@@ -97,15 +97,12 @@ public class StudentService {
         }
     }
 
-    public Resource getStudentCV(String email) throws IOException {
-        Student student = studentRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Student not found"));
-
+    private Resource loadCV(Student student) throws IOException {
         if (student.getCvFilePath() == null) {
             throw new RuntimeException("CV not found");
         }
 
-        Path filePath = Paths.get(uploadDir).resolve(Paths.get(student.getCvFilePath()).getFileName());
+        Path filePath = Paths.get(uploadDir, student.getCvFilePath());
         Resource resource = new UrlResource(filePath.toUri());
 
         if (!resource.exists() || !resource.isReadable()) {
@@ -114,4 +111,19 @@ public class StudentService {
 
         return resource;
     }
+
+
+    public Resource getStudentCV(String email) throws IOException {
+        Student student = studentRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Student not found"));
+        return loadCV(student);
+    }
+
+
+    public Resource getStudentCVByStudentId(Long studentId) throws IOException {
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new RuntimeException("Student not found"));
+        return loadCV(student);
+    }
+
 }

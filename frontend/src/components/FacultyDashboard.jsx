@@ -1,136 +1,108 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Shield, LogOut } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-
-const API_URL = 'http://localhost:8080';
+import { Link, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { Users, LogOut, CheckCircle, FileText, Building2 } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import PendingInternships from "./PendingInternships";
 
 export default function FacultyDashboard() {
+  const { logout } = useAuth();
   const navigate = useNavigate();
-  const [internships, setInternships] = useState([]);
-  const [applications, setApplications] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const { token, logout } = useAuth();
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
-
-  useEffect(() => {
-    fetchAllData();
-  }, []);
-
-  const fetchAllData = async () => {
-    try {
-      const [internshipsRes, applicationsRes] = await Promise.all([
-        fetch(`${API_URL}/internships`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-        fetch(`${API_URL}/applications`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-      ]);
-
-      const internshipsData = await internshipsRes.json();
-      const applicationsData = await applicationsRes.json();
-
-      
-      setInternships(Array.isArray(internshipsData) ? internshipsData : internshipsData.data || []);
-      setApplications(Array.isArray(applicationsData) ? applicationsData : applicationsData.data || []);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      setInternships([]);
-      setApplications([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-600">Učitavanje...</p>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-2">
-              <Shield className="h-8 w-8 text-indigo-600" />
-              <span className="text-xl font-bold text-gray-900">Fakultet - Admin Pregled</span>
-            </div>
-            <button onClick={handleLogout} className="flex items-center gap-2 text-gray-600 hover:text-gray-900">
-              <LogOut className="h-5 w-5" />
-              Odjavi se
-            </button>
+      {/* NAVBAR */}
+      <nav className="bg-white border-b shadow-sm">
+        <div className="max-w-7xl mx-auto flex justify-between items-center h-16 px-6">
+          <div className="flex items-center gap-3">
+            <Users className="h-7 w-7 text-indigo-600" />
+            <span className="text-xl font-bold text-gray-900">Referent</span>
           </div>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-3 py-1 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition"
+          >
+            <LogOut className="h-5 w-5" />
+            Odjavi se
+          </button>
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Statistika */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">Ukupno praksi</h3>
-            <p className="text-4xl font-bold text-indigo-600">{internships.length}</p>
-          </div>
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">Ukupno prijava</h3>
-            <p className="text-4xl font-bold text-green-600">{applications.length}</p>
-          </div>
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">Aktivne kompanije</h3>
-            <p className="text-4xl font-bold text-purple-600">
-              {new Set(internships.map((i) => i.company?.id).filter(Boolean)).size}
-            </p>
-          </div>
-        </div>
-
-        {/* Sve prakse */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Sve prakse</h2>
-          <div className="space-y-3">
-            {internships.map((internship) => (
-              <div key={internship.id} className="border-b pb-3">
-                <h3 className="font-semibold text-gray-900">{internship.title}</h3>
-                <p className="text-sm text-gray-600">{internship.company?.companyName || 'N/A'}</p>
-                <p className="text-xs text-gray-500">
-                  Dostupno pozicija: {internship.availablePositions || 0}
-                </p>
-              </div>
-            ))}
-            {internships.length === 0 && (
-              <p className="text-gray-500 text-center py-4">Nema praksi</p>
-            )}
-          </div>
-        </div>
-
-        {/* Sve prijave */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Sve prijave</h2>
-          <div className="space-y-3">
-            {applications.map((app) => (
-              <div key={app.id} className="border-b pb-3">
-                <p className="font-semibold text-gray-900">
-                  {app.student?.firstName && app.student?.lastName
-                    ? `${app.student.firstName} ${app.student.lastName}`
-                    : app.student?.email || 'N/A'}
-                </p>
-                <p className="text-sm text-gray-600">{app.internship?.title || 'N/A'}</p>
-                <p className="text-xs text-gray-500">Status: {app.status || 'PENDING'}</p>
-              </div>
-            ))}
-            {applications.length === 0 && (
-              <p className="text-gray-500 text-center py-4">Nema prijava</p>
-            )}
-          </div>
+      {/* TABS */}
+      <div className="bg-white border-b">
+        <div className="max-w-7xl mx-auto flex gap-4 px-6 py-3">
+          <TabLink label="Početna" to="/faculty/dashboard" icon={Users} />
+          <TabLink label="Prakse na čekanju" to="/faculty/dashboard/internships" icon={CheckCircle} />
+          <TabLink label="Prijave na čekanju" to="/faculty/dashboard/applications" icon={FileText} />
+          <TabLink label="Studenti" to="/faculty/dashboard/students" icon={Users} />
+          <TabLink label="Kompanije" to="/faculty/dashboard/companies" icon={Building2} />
         </div>
       </div>
+
+      {/* CONTENT */}
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <Routes>
+          <Route path="/" element={<FacultyHome />} />
+          <Route path="internships" element={<PendingInternships />} />
+          <Route path="applications" element={<PendingApplications />} />
+          <Route path="students" element={<Students />} />
+          <Route path="companies" element={<Companies />} />
+          <Route path="*" element={<Navigate to="/faculty/dashboard" replace />} />
+        </Routes>
+      </div>
     </div>
+  );
+}
+
+function TabLink({ label, icon: Icon, to }) {
+  return (
+    <Link
+      to={to}
+      className="flex items-center gap-2 px-4 py-2 rounded-full font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition"
+    >
+      <Icon className="h-4 w-4" />
+      {label}
+    </Link>
+  );
+}
+
+function FacultyHome() {
+  return (
+    <div className="text-center py-16">
+      <h2 className="text-3xl font-bold text-gray-900 mb-4">Dobrodošli</h2>
+      <p className="text-gray-600">
+        Kao referent za stručne prakse pregledajte i odobrite prakse i prijave studenata.
+      </p>
+    </div>
+  );
+}
+
+function PendingApplications() {
+  return (
+    <>
+      <h2 className="text-2xl font-bold mb-4">Prijave na čekanju</h2>
+      <p className="text-gray-600">Lista prijava studenata na odobrenju.</p>
+    </>
+  );
+}
+
+function Students() {
+  return (
+    <>
+      <h2 className="text-2xl font-bold mb-4">Studenti</h2>
+      <p className="text-gray-600">Pregled studenata i njihovih prijava.</p>
+    </>
+  );
+}
+
+function Companies() {
+  return (
+    <>
+      <h2 className="text-2xl font-bold mb-4">Kompanije</h2>
+      <p className="text-gray-600">Pregled kompanija i njihovih praksi.</p>
+    </>
   );
 }

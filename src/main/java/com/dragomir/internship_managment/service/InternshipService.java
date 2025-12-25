@@ -2,6 +2,10 @@ package com.dragomir.internship_managment.service;
 
 import com.dragomir.internship_managment.domain.Company;
 import com.dragomir.internship_managment.domain.Internship;
+import com.dragomir.internship_managment.domain.InternshipStatus;
+import com.dragomir.internship_managment.dto.InternshipDTO;
+import com.dragomir.internship_managment.dto.PendingInternshipDTO;
+import com.dragomir.internship_managment.repository.ApplicationRepository;
 import com.dragomir.internship_managment.repository.CompanyRepository;
 import com.dragomir.internship_managment.repository.InternshipRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +22,6 @@ public class InternshipService {
 
     private final InternshipRepository internshipRepository;
     private final CompanyRepository companyRepository;
-
     @Autowired
     public InternshipService(InternshipRepository internshipRepository, CompanyRepository companyRepository) {
         this.internshipRepository = internshipRepository;
@@ -39,11 +42,25 @@ public class InternshipService {
         return internshipRepository.findAll();
     }
 
-    public Page<Internship> getFilteredInternships(int page, int limit, String search, String location, String company, Integer weeksDuration, Boolean isPaid){
-        System.out.println("3AAAAAAAAAAAAAAAAAAAAAAAA");
-        Pageable p = PageRequest.of(page -1, limit);
-        return internshipRepository.findFilteredInternships(search, location, company, weeksDuration, isPaid, p);
+    public Page<Internship> getFilteredInternships(
+            int page, int limit,
+            String search, String location, String company,
+            Integer weeksDuration, Boolean isPaid, boolean isStudent) {
 
+        Pageable pageable = PageRequest.of(page - 1, limit);
+
+        // Ako je STUDENT, filtriraj samo APPROVED
+        String status = isStudent ? "APPROVED" : null;
+
+        return internshipRepository.findFilteredInternships(
+                search,
+                location,
+                company,
+                weeksDuration,
+                isPaid,
+                status,
+                pageable
+        );
     }
 
     public Internship getInternshipById(Long id) {
@@ -52,5 +69,44 @@ public class InternshipService {
     }
 
 
+    public Object getInternshipsByCompany(Authentication auth) {
+        String email = auth.getName();
+        Company company = companyRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Company not found"));
 
+        List<Internship> internships = internshipRepository.findByCompany(company);
+
+        return internships.stream().map(internship ->  new InternshipDTO(
+                internship.getId(),
+                internship.getTitle(),
+                internship.getDescription(),
+                internship.getApplicationsCount()
+        ));
+
+
+
+    }
+
+    public Internship approve(Long id, Authentication auth) {
+            return null;
+    }
+
+    public Internship reject(Long id, Authentication auth) {
+        return null;
+    }
+
+    public List<PendingInternshipDTO> getPendingForFaculty() {
+        return internshipRepository
+                .findByStatus(InternshipStatus.PENDING)
+                .stream()
+                .map(i -> new PendingInternshipDTO(
+                        i.getId(),
+                        i.getTitle(),
+                        i.getCompany().getCompanyName(),
+                        i.getCategory(),
+                        i.getDurationWeeks(),
+                        i.getAvailablePositions()
+                ))
+                .toList();
+    }
 }

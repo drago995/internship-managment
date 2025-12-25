@@ -24,7 +24,9 @@ public class Internship {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "company_id", nullable = false)
     private Company company;
-
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private InternshipStatus status = InternshipStatus.PENDING;
     @Column(nullable = false, length = 255)
     private String title;
 
@@ -99,7 +101,7 @@ public class Internship {
         updatedAt = LocalDateTime.now();
     }
 
-    // Helper methods
+
     public void addApplication(Application application) {
         applications.add(application);
         application.setInternship(this);

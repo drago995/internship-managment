@@ -26,7 +26,8 @@ public class AuthService {
                         loginDto.getPassword()
                 )
         );
-
+        // generate the jew token first tame after user login, and send it back to him
+        // also fill the security context on every request
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtil.generateToken(authentication);
 
