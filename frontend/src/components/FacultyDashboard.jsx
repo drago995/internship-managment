@@ -2,6 +2,8 @@ import { Link, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { Users, LogOut, CheckCircle, FileText, Building2 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import PendingInternships from "./PendingInternships";
+import PendingApplications from "./PendingApplications";
+import CompaniesOverview from "./CompaniesOverview";
 
 export default function FacultyDashboard() {
   const { logout } = useAuth();
@@ -49,7 +51,7 @@ export default function FacultyDashboard() {
           <Route path="internships" element={<PendingInternships />} />
           <Route path="applications" element={<PendingApplications />} />
           <Route path="students" element={<Students />} />
-          <Route path="companies" element={<Companies />} />
+          <Route path="companies" element={<CompaniesOverview />} />
           <Route path="*" element={<Navigate to="/faculty/dashboard" replace />} />
         </Routes>
       </div>
@@ -80,14 +82,6 @@ function FacultyHome() {
   );
 }
 
-function PendingApplications() {
-  return (
-    <>
-      <h2 className="text-2xl font-bold mb-4">Prijave na čekanju</h2>
-      <p className="text-gray-600">Lista prijava studenata na odobrenju.</p>
-    </>
-  );
-}
 
 function Students() {
   return (
@@ -98,11 +92,3 @@ function Students() {
   );
 }
 
-function Companies() {
-  return (
-    <>
-      <h2 className="text-2xl font-bold mb-4">Kompanije</h2>
-      <p className="text-gray-600">Pregled kompanija i njihovih praksi.</p>
-    </>
-  );
-}

@@ -38,7 +38,7 @@ public class Company extends User {
     private String website;
 
     @Column(length = 500)
-    private String industry; // e.g., "IT", "Finance", "Healthcare"
+    private String industry;
 
 
     @JsonIgnore

@@ -1,66 +1,65 @@
 import { useEffect, useState } from "react";
-import { Check, X, Building2, Clock, Users } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Check, X, User, Calendar, FileText } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 const API_URL = "http://localhost:8080";
 
-export default function PendingInternships() {
+export default function PendingApplications() {
     const { token } = useAuth();
-    const [internships, setInternships] = useState([]);
+    const [applications, setApplications] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchInternships = async () => {
+        const fetchApplications = async () => {
             try {
-                const res = await fetch(`${API_URL}/internships/pending`, {
+                const res = await fetch(`${API_URL}/applications/pending`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 const data = await res.json();
-                setInternships(data.data); // ApiResponse.data
+                setApplications(data.data);
             } catch (err) {
                 console.error(err);
             } finally {
                 setLoading(false);
             }
         };
+        // we put the token inside of dependency array in case of log out / log in
 
-        fetchInternships();
+        fetchApplications();
     }, [token]);
-    
+
     const decide = async (id, action) => {
-    const prevList = [...internships];
-    setInternships((prev) => prev.filter((i) => i.id !== id));
+        // optimistic update
+        const prevList = [...applications];
+        setApplications((prev) => prev.filter((a) => a.id !== id));
 
-    try {
-        const res = await fetch(`${API_URL}/internships/${id}/${action}`, {
-            method: "PUT",
-            headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (!res.ok) throw new Error("Server error");
-    } catch (err) {
-        console.error(err);
-        alert("Greška prilikom obrade");
-        setInternships(prevList); 
-    }
-};
+        try {
+            await fetch(`${API_URL}/applications/${id}/${action}`, {
+                method: "PUT",
+                headers: { Authorization: `Bearer ${token}` },
+            });
+        } catch (err) {
+            console.error(err);
+            alert("Greška prilikom obrade");
+            setApplications(prevList);
+        }
+    };
 
     if (loading)
         return <p className="text-gray-500 text-center py-12">Učitavanje...</p>;
-    if (internships.length === 0)
-        return <p className="text-gray-500 text-center py-12">Nema praksi za obradu.</p>;
+    if (applications.length === 0)
+        return <p className="text-gray-500 text-center py-12">Nema prijava za obradu.</p>;
 
     return (
         <div className="max-w-4xl mx-auto p-6">
 
             <div className="bg-white border rounded-lg divide-y">
-                {internships.map((internship) => (
+                {applications.map((app) => (
                     <Row
-                        key={internship.id}
-                        internship={internship}
-                        onApprove={() => decide(internship.id, "approve")}
-                        onReject={() => decide(internship.id, "reject")}
+                        key={app.id}
+                        application={app}
+                        onApprove={() => decide(app.id, "approve")}
+                        onReject={() => decide(app.id, "reject")}
                     />
                 ))}
             </div>
@@ -68,36 +67,29 @@ export default function PendingInternships() {
     );
 }
 
-function Row({ internship, onApprove, onReject }) {
+function Row({ application, onApprove, onReject }) {
     return (
         <div className="flex items-center justify-between px-5 py-4 hover:bg-gray-50">
             {/* LEFT */}
             <div>
-                <Link
-                    to={`/faculty/internships/${internship.id}`}
-                    className="font-medium text-gray-900 hover:underline"
-                >
-                    {internship.title}
-                </Link>
+                <div className="font-medium text-gray-900">{application.studentName}</div>
 
                 <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
                     <span className="flex items-center gap-1">
-                        <Building2 className="h-4 w-4" />
-                        {internship.companyName}
+                        <FileText className="h-4 w-4" />
+                        {application.internshipTitle}
                     </span>
 
                     <span className="flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
-                        {internship.durationWeeks} ned.
+                        <Calendar className="h-4 w-4" />
+                        {application.internshipDurationWeeks
+                            ? `${application.internshipDurationWeeks} ned.`
+                            : "N/A"}
                     </span>
 
                     <span className="flex items-center gap-1">
-                        <Users className="h-4 w-4" />
-                        {internship.availablePositions}
-                    </span>
-
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100">
-                        {internship.category}
+                        <User className="h-4 w-4" />
+                        {application.studentEmail || "N/A"}
                     </span>
                 </div>
             </div>

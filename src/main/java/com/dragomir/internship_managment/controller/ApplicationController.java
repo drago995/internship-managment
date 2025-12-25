@@ -35,21 +35,24 @@ public class ApplicationController {
         return ResponseEntity.ok(new ApiResponse(true, "Application submitted successfully", application));
     }
 
-    @PutMapping("/{id}/approve")
+
+    @GetMapping("/pending")
     @PreAuthorize("hasRole('FACULTY')")
-    public ResponseEntity<ApiResponse> approve(@PathVariable Long id) {
-        Application application = service.approve(id);
-        return ResponseEntity.ok(new ApiResponse(true, "Application approved", application));
+    public ResponseEntity<ApiResponse> getPendingApplications() {
+        var applications = service.getPendingApplications();
+        return ResponseEntity.ok(new ApiResponse(true, "Pending applications retrieved successfully", applications));
     }
 
-    @PutMapping("/{id}/reject")
+    @PutMapping("/{id}/{action}")
     @PreAuthorize("hasRole('FACULTY')")
-    public ResponseEntity<ApiResponse> reject(@PathVariable Long id, @RequestBody(required = false) Map<String, String> body) {
-        String reason = body != null ? body.get("reason") : null;
-        Application application = service.reject(id, reason);
-        return ResponseEntity.ok(new ApiResponse(true, "Application rejected", application));
+    public ResponseEntity<ApiResponse> decideApplication(
+            @PathVariable Long id,
+            @PathVariable String action
+    ) {
+        var application = service.decideApplicationStatus(id, action);
+        String msg = "approve".equalsIgnoreCase(action) ? "approve" : "reject";
+        return ResponseEntity.ok(new ApiResponse(true, msg, application));
     }
-
 
 
 }

@@ -1,9 +1,11 @@
 package com.dragomir.internship_managment.service;
 
 import com.dragomir.internship_managment.domain.Application;
+import com.dragomir.internship_managment.domain.ApplicationStatus;
 import com.dragomir.internship_managment.domain.Internship;
 import com.dragomir.internship_managment.domain.Student;
 import com.dragomir.internship_managment.dto.ApplicationDTO;
+import com.dragomir.internship_managment.dto.PendingApplicationDTO;
 import com.dragomir.internship_managment.repository.ApplicationRepository;
 import com.dragomir.internship_managment.repository.InternshipRepository;
 import com.dragomir.internship_managment.repository.StudentRepository;
@@ -14,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -120,12 +123,34 @@ public class ApplicationService {
 
     }
 
-    public Application reject(Long id, String reason) {
-        return null;
+    public List<PendingApplicationDTO> getPendingApplications() {
+        return repo.findByStatus(ApplicationStatus.PENDING)
+                .stream()
+                .map(a -> new PendingApplicationDTO(
+                        a.getId(),
+                        a.getStudent().getFullName(),
+                        a.getStudent().getEmail(),
+                        a.getInternship().getTitle(),
+                        a.getInternship().getDurationWeeks()
+                )).toList();
+
     }
 
-    public Application approve(Long id) {
-        return null;
+    // approve/reject u jednoj metodi
+    public Application decideApplicationStatus(Long id, String action) {
+        Application app = repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Application not found"));
+
+        if ("approve".equalsIgnoreCase(action)) {
+            app.setStatus(ApplicationStatus.ACCEPTED);
+        } else if ("reject".equalsIgnoreCase(action)) {
+            app.setStatus(ApplicationStatus.REJECTED);
+        } else {
+            throw new IllegalArgumentException("Invalid action: must be approve or reject");
+        }
+
+        return repo.save(app);
     }
+
 }
 

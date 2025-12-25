@@ -109,4 +109,23 @@ public class InternshipService {
                 ))
                 .toList();
     }
+
+    public Internship decideInternshipPlacement(Long id, String action, Authentication auth) {
+        Internship internship = internshipRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Internship not found"));
+
+        if (internship.getStatus() != InternshipStatus.PENDING) {
+            throw new RuntimeException("Internship was already approved/rejected");
+        }
+
+        if ("approve".equalsIgnoreCase(action)) {
+            internship.setStatus(InternshipStatus.APPROVED);
+        } else if ("reject".equalsIgnoreCase(action)) {
+            internship.setStatus(InternshipStatus.REJECTED);
+        } else {
+            throw new IllegalArgumentException("Invalid action: must be 'approve' or 'reject'");
+        }
+
+        return internshipRepository.save(internship);
+    }
 }

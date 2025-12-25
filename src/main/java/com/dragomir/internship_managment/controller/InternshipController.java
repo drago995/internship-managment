@@ -86,23 +86,14 @@ public class InternshipController {
 
     @PutMapping("/{id}/{action}")
     @PreAuthorize("hasRole('FACULTY')")
-    public ResponseEntity<ApiResponse> decideInternship(
+    public ResponseEntity<ApiResponse> decideInternshipStatus(
             @PathVariable Long id,
             @PathVariable String action,
             Authentication auth) {
 
-        Internship internship;
-
-        if ("approve".equalsIgnoreCase(action)) {
-            internship = internshipService.approve(id, auth);
-            return ResponseEntity.ok(new ApiResponse(true, "Internship approved", internship));
-        } else if ("reject".equalsIgnoreCase(action)) {
-            internship = internshipService.reject(id, auth);
-            return ResponseEntity.ok(new ApiResponse(true, "Internship rejected", internship));
-        } else {
-            return ResponseEntity.badRequest()
-                    .body(new ApiResponse(false, "Invalid action: must be 'approve' or 'reject'", null));
-        }
+        Internship internship = internshipService.decideInternshipPlacement(id, action, auth);
+        String msg = "approve".equalsIgnoreCase(action) ? "Internship approved" : "Internship rejected";
+        return ResponseEntity.ok(new ApiResponse(true, msg, internship));
     }
 
 
